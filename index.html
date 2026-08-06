@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Island Yacht Club — Thursday Night Cruise</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script>
+  emailjs.init({ publicKey: "9RUpSzmtz444VY-f4" });
+</script>
+<style>
+  :root{
+    --navy: #0B2436; --navy-2: #123449; --paper: #EDEAE0; --paper-2: #E2DECE;
+    --teal: #2E6E6E; --flag: #C33D2E; --ink: #16222B; --line: #C9C2AC; --line-dark: rgba(237,234,224,0.18);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{ background: var(--navy); color: var(--paper); font-family: 'Inter', sans-serif; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+  @media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important;} }
+  .wrap{ max-width: 640px; margin: 0 auto; padding: 0 0 64px; }
+
+  header{ padding: 32px 20px 22px; border-bottom: 1px solid var(--line-dark); }
+  .eyebrow{ font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--teal); }
+  h1{ font-family: 'Big Shoulders Display', sans-serif; font-weight: 800; font-size: clamp(34px, 9vw, 46px); line-height: 0.92; letter-spacing: 0.01em; margin: 6px 0 10px; text-transform: uppercase; color: var(--paper); }
+  h1 span{ color: var(--flag); }
+  .header-row{ display:flex; justify-content:space-between; align-items:flex-end; gap:10px; flex-wrap: wrap; }
+  .date-nav{ display:flex; align-items:center; gap: 10px; flex-wrap: wrap; }
+  .nav-btn{ background: none; border: 1px solid var(--line-dark); color: var(--paper); width: 30px; height: 30px; border-radius: 3px; font-size: 15px; line-height: 1; display:flex; align-items:center; justify-content:center; flex-shrink:0; cursor:pointer; }
+  .nav-btn:disabled{ opacity: 0.25; }
+  .date-readout{ font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--paper); opacity: 0.8; }
+  .past-badge{ font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing:0.08em; color: var(--paper); opacity: 0.45; border: 1px solid var(--line-dark); border-radius: 2px; padding: 2px 6px; margin-left: 8px; text-transform: uppercase; }
+  .today-tag{ display:inline-block; font-family:'IBM Plex Mono', monospace; font-size:9px; letter-spacing:0.06em; text-transform:uppercase; color:var(--flag); border:1px solid var(--flag); border-radius:2px; padding:1px 5px; margin-left:7px; vertical-align:middle; }
+  .schedule-link{ background: none; border: none; color: var(--teal); font-weight:600; font-size: 13px; font-family: 'Inter', sans-serif; text-decoration: underline; text-underline-offset: 2px; padding: 4px 0; cursor:pointer; }
+
+  .cta-row{ display:flex; gap: 10px; padding: 20px 20px 4px; }
+  button{ font-family: 'Inter', sans-serif; cursor:pointer; }
+  .btn{ flex:1; border:none; border-radius:3px; padding:14px 12px; font-weight:600; font-size:14px; }
+  .btn-primary{ background: var(--flag); color: var(--paper); }
+  .btn-secondary{ background: transparent; color: var(--paper); border: 1px solid var(--line-dark); }
+  .btn:disabled{ opacity: 0.3; }
+  .btn:active{ transform: translateY(1px); }
+
+  section{ padding: 28px 20px 4px; }
+  .section-head{ display:flex; align-items:baseline; justify-content:space-between; margin-bottom: 14px; }
+  .section-title{ font-family:'Big Shoulders Display', sans-serif; font-weight:700; font-size:22px; text-transform:uppercase; }
+  .section-count{ font-family:'IBM Plex Mono', monospace; font-size:12px; color: var(--teal); }
+
+  .slip{ background: var(--navy-2); border: 1px solid var(--line-dark); border-left: 3px solid var(--teal); border-radius: 2px; padding: 14px 14px 12px; margin-bottom: 10px; position: relative; }
+  .boat-name{ font-family:'Big Shoulders Display', sans-serif; font-weight:700; font-size:21px; text-transform:uppercase; line-height:1.05; }
+  .boat-time{ font-family:'IBM Plex Mono', monospace; font-size:12px; color: var(--flag); margin-top:2px; }
+  .skipper{ font-size:13px; color: var(--paper); opacity:0.72; margin-top:2px; }
+  .slip-notes{ font-family:'IBM Plex Mono', monospace; font-size:12px; color: var(--paper); opacity:0.6; margin-top:6px; }
+  .berths{ display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; align-items:center; }
+  .berth{ width:13px; height:13px; border-radius:50%; border:1.5px solid var(--teal); background:transparent; flex-shrink:0; }
+  .berth.filled{ background: var(--flag); border-color: var(--flag); }
+  .berth-label{ font-family:'IBM Plex Mono', monospace; font-size:11px; color: var(--paper); opacity:0.55; margin-left:4px; }
+  .crew-names{ font-size:12.5px; color: var(--paper); opacity:0.8; margin-top:8px; line-height:1.5; }
+  .crew-names b{ opacity:1; font-weight:600; }
+  .slip-actions{ display:flex; gap:8px; margin-top:10px; }
+  .link-btn{ background:none; border:none; color: var(--teal); font-size:12.5px; font-weight:600; font-family:'Inter', sans-serif; padding:4px 0; text-decoration:underline; text-underline-offset:2px; cursor:pointer; }
+  .remove-x{ position:absolute; top:10px; right:12px; background:none; border:none; color: var(--paper); opacity:0.35; font-size:16px; line-height:1; padding:4px; cursor:pointer; }
+  .remove-x:hover{ opacity:0.8; }
+
+  .crew-card-wrap{ margin-bottom: 8px; }
+  .crew-card{ background: var(--navy-2); border: 1px solid var(--line-dark); border-left: 3px solid var(--flag); border-radius: 2px; padding: 12px 14px; display:flex; justify-content:space-between; align-items:center; gap:10px; }
+  .crew-name{ font-weight:600; font-size:14.5px; }
+  .crew-meta{ font-family:'IBM Plex Mono', monospace; font-size:11.5px; color: var(--paper); opacity:0.6; margin-top:2px; }
+  .status-tag{ font-family:'IBM Plex Mono', monospace; font-size:9.5px; text-transform:uppercase; letter-spacing:0.06em; border-radius: 2px; padding: 1px 6px; margin-left: 6px; vertical-align: middle; }
+  .status-tag.pending{ color: var(--paper); border: 1px solid var(--paper); opacity: 0.6; }
+  .pending-block{ margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line-dark); }
+  .pending-block-label{ font-family:'IBM Plex Mono', monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color: var(--paper); opacity: 0.55; margin-bottom: 6px; }
+  .pending-row{ display:flex; justify-content:space-between; align-items:center; gap:8px; padding: 6px 0; }
+  .pending-row-name{ font-size: 13.5px; font-weight: 600; }
+  .pending-row-meta{ font-family:'IBM Plex Mono', monospace; font-size: 11px; opacity: 0.5; }
+  .pending-actions{ display:flex; gap:6px; flex-shrink:0; }
+  .approve-btn, .decline-btn{ font-family:'Inter', sans-serif; font-size:11.5px; font-weight:600; border-radius:2px; padding:5px 9px; border:none; cursor:pointer; }
+  .approve-btn{ background: var(--teal); color: var(--paper); }
+  .decline-btn{ background: transparent; color: var(--paper); border: 1px solid var(--line-dark); }
+
+  .empty{ font-family:'IBM Plex Mono', monospace; font-size:13px; color: var(--paper); opacity:0.5; border: 1px dashed var(--line-dark); border-radius:2px; padding:18px 14px; text-align:left; }
+
+  .form-panel{ background: var(--paper); color: var(--ink); border-radius:4px; padding:18px; margin:14px 20px 0; }
+  .form-title{ font-family:'Big Shoulders Display', sans-serif; font-weight:700; font-size:20px; text-transform:uppercase; margin-bottom:12px; }
+  .field{ margin-bottom:12px; }
+  .field-row{ display:flex; gap:10px; }
+  .field-row .field{ flex:1; }
+  .field label{ display:block; font-family:'IBM Plex Mono', monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color: var(--teal); margin-bottom:5px; }
+  .field input, .field select, .field textarea{ width:100%; border:1px solid var(--line); border-radius:3px; background:#fff; padding:10px 11px; font-family:'Inter', sans-serif; font-size:15px; color: var(--ink); }
+  .field textarea{ resize:vertical; min-height:44px; }
+  .form-actions{ display:flex; gap:8px; margin-top:4px; }
+  .form-actions .btn-cancel{ background:transparent; color: var(--ink); border:1px solid var(--line); }
+  .form-error{ color: var(--flag); font-size:12.5px; margin-top:-4px; margin-bottom:10px; }
+  .form-note{ font-family:'IBM Plex Mono', monospace; font-size:11px; color: var(--ink); opacity:0.55; margin: -4px 0 12px; }
+
+  .loading{ padding:40px 20px; text-align:center; font-family:'IBM Plex Mono', monospace; opacity:0.5; font-size:13px; }
+
+  .etiquette{ margin: 18px 20px 0; background: var(--navy-2); border: 1px solid var(--line-dark); border-left: 3px solid var(--teal); border-radius: 2px; overflow: hidden; }
+  .etiquette summary{ list-style: none; cursor: pointer; padding: 13px 14px; display:flex; justify-content:space-between; align-items:center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--paper); }
+  .etiquette summary::-webkit-details-marker{ display:none; }
+  .etiquette summary::after{ content: '+'; font-size: 16px; opacity: 0.6; }
+  .etiquette[open] summary::after{ content: '–'; }
+  .etiquette-body{ padding: 4px 16px 16px; }
+  .etiquette-group{ margin-bottom: 14px; }
+  .etiquette-group:last-child{ margin-bottom: 0; }
+  .etiquette-group-title{ font-family: 'Big Shoulders Display', sans-serif; font-weight: 700; font-size: 15px; text-transform: uppercase; letter-spacing: 0.01em; color: var(--paper); margin-bottom: 6px; }
+  .etiquette-group ul{ margin: 0; padding-left: 18px; }
+  .etiquette-group li{ font-size: 13px; line-height: 1.55; color: var(--paper); opacity: 0.85; margin-bottom: 4px; }
+  .etiquette-group li b{ opacity: 1; font-weight: 600; }
+  .etiquette-group p{ font-size: 13px; line-height: 1.6; color: var(--paper); opacity: 0.85; margin: 0; }
+
+  .back-link{ background:none; border:none; color: var(--teal); font-weight:600; font-size:13px; font-family:'IBM Plex Mono', monospace; text-transform:uppercase; letter-spacing:0.05em; padding:0 0 4px; cursor:pointer; }
+  .week-card{ display:flex; justify-content:space-between; align-items:center; gap: 12px; background: var(--navy-2); border:1px solid var(--line-dark); border-left: 3px solid var(--teal); border-radius:2px; padding: 14px 14px; margin-bottom: 8px; text-align:left; width:100%; cursor:pointer; }
+  .week-card.is-past{ opacity: 0.45; border-left-color: var(--line-dark); }
+  .week-card.is-current{ border-left-color: var(--flag); }
+  .week-card-date{ font-family:'Big Shoulders Display', sans-serif; font-weight:700; font-size:18px; text-transform:uppercase; }
+  .week-card-sub{ font-family:'IBM Plex Mono', monospace; font-size:11px; color: var(--paper); opacity:0.55; margin-top:3px; }
+  .week-card-boats{ font-size:12px; color: var(--paper); opacity:0.75; margin-top:4px; max-width: 260px; }
+  .week-card-count{ font-family:'IBM Plex Mono', monospace; font-size:20px; font-weight:500; text-align:right; flex-shrink:0; }
+  .week-card-count small{ display:block; font-size:9px; opacity:0.5; letter-spacing:0.06em; text-transform:uppercase; }
+
+  footer{ padding:30px 20px 10px; text-align:center; font-family:'IBM Plex Mono', monospace; font-size:11px; color: var(--paper); opacity:0.35; }
+  .conn-status{ text-align:center; font-family:'IBM Plex Mono', monospace; font-size:11px; color: var(--flag); padding: 6px 20px 0; }
+</style>
+</head>
+<body>
+<div id="root" class="wrap"><div class="loading">LOADING BOARD…</div></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, doc, updateDoc, deleteDoc,
+  onSnapshot, query, where, orderBy, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB3UQ3owfLf9AxxvHxfwgSDqd2EPubRVBo",
+  authDomain: "cruising-club.firebaseapp.com",
+  projectId: "cruising-club",
+  storageBucket: "cruising-club.firebasestorage.app",
+  messagingSenderId: "918232192343",
+  appId: "1:918232192343:web:fbb842d562fca828791a12",
+  measurementId: "G-BHW74ZNJPK"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const EMAIL_SERVICE_ID = "muggs-sailing";
+const EMAIL_TEMPLATE_ID = "template_crewbank";
+const ADMIN_PASSCODE = "muggs3141";
+const CLUB_NAME = "Island Yacht Club";
+
+// ---------- date helpers ----------
+function toISO(d){ const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0'); return `${y}-${m}-${dd}`; }
+function baseThursday(){ const d=new Date(); const day=d.getDay(); const diff=(4-day+7)%7; d.setDate(d.getDate()+diff); d.setHours(0,0,0,0); return d; }
+function thursdayForOffset(offset){ const d=new Date(baseThursday()); d.setDate(d.getDate()+offset*7); return d; }
+function formatShort(dateObj){ return dateObj.toLocaleDateString('en-US',{month:'short',day:'numeric'}); }
+function formatReadable(dateObj){ return dateObj.toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'}); }
+function formatTime12(t){
+  if(!t) return '';
+  const [h,m] = t.split(':').map(Number);
+  const period = h>=12 ? 'PM':'AM';
+  const h12 = h%12===0 ? 12 : h%12;
+  return `${h12}:${String(m).padStart(2,'0')} ${period}`;
+}
+function isPastIso(iso){ const today=new Date(); today.setHours(0,0,0,0); return new Date(iso+'T00:00:00') < today; }
+
+const WEEKS_PAST = 2, WEEKS_FUTURE = 9;
+const WEEK_OFFSETS = []; for(let i=-WEEKS_PAST;i<=WEEKS_FUTURE;i++) WEEK_OFFSETS.push(i);
+const BASE_ISO = toISO(baseThursday());
+
+// ---------- state ----------
+let screen = 'week'; // 'week' | 'schedule'
+let currentIso = BASE_ISO;
+let boats = [];   // all loaded boat docs (live)
+let crew = [];    // all loaded crew docs (live)
+let uiMode = null; // null | 'add-boat' | 'add-crew'
+let uiCrewPreselectBoat = null;
+let addToBoatFor = null;
+let firestoreError = false;
+
+function uid(){ return Math.random().toString(36).slice(2,9); }
+function escapeHtml(str){ const d=document.createElement('div'); d.textContent = str==null?'':str; return d.innerHTML; }
+
+// ---------- Firestore live sync ----------
+const boatsCol = collection(db, 'boats');
+const crewCol = collection(db, 'crew');
+const cutoffIso = (() => { const d = new Date(); d.setDate(d.getDate() - 21); return toISO(d); })();
+
+onSnapshot(query(boatsCol, where('date','>=',cutoffIso), orderBy('date','asc')), snap => {
+  boats = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  firestoreError = false;
+  render();
+}, err => { firestoreError = true; render(); console.error(err); });
+
+onSnapshot(query(crewCol, where('date','>=',cutoffIso), orderBy('date','asc')), snap => {
+  crew = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  render();
+}, err => { console.error(err); });
+
+// ---------- email ----------
+function sendNotification(toEmail, toName, subjectLine, messageLine, extraNote){
+  if(!toEmail) return;
+  const manageLink = window.location.origin + window.location.pathname;
+  emailjs.send(EMAIL_SERVICE_ID, EMAIL_TEMPLATE_ID, {
+    to_email: toEmail,
+    to_name: toName || 'there',
+    subject_line: subjectLine,
+    message_line: messageLine,
+    extra_note: extraNote || '',
+    manage_link: manageLink,
+    club_name: CLUB_NAME
+  }).catch(err => console.error('Email failed', err));
+}
+
+// ---------- derived data for a given date ----------
+function boatsForDate(iso){ return boats.filter(b => b.date === iso); }
+function crewForDate(iso){ return crew.filter(c => c.date === iso); }
+
+// ---------- render ----------
+function render(){
+  if(screen === 'week') renderWeekScreen();
+  else renderScheduleScreen();
+}
+
+function renderWeekScreen(){
+  const dateObj = new Date(currentIso + 'T00:00:00');
+  const dayBoats = boatsForDate(currentIso);
+  const dayCrew = crewForDate(currentIso);
+  const unassignedCrew = dayCrew.filter(c => !c.boatId);
+  const past = isPastIso(currentIso);
+  const isToday = currentIso === toISO(new Date());
+
+  const offsetIndex = WEEK_OFFSETS.findIndex(o => toISO(thursdayForOffset(o)) === currentIso);
+
+  let html = '';
+  html += `
+    <header>
+      <div class="eyebrow">${escapeHtml(CLUB_NAME)} · Weekly Board</div>
+      <h1>Thursday<br>Night <span>Cruise</span></h1>
+      <div class="header-row">
+        <div class="date-nav">
+          <button class="nav-btn" onclick="app_prevDay()">‹</button>
+          <div class="date-readout">${formatReadable(dateObj).toUpperCase()}${isToday?'<span class="today-tag">Today</span>':''}${past?'<span class="past-badge">Past</span>':''}</div>
+          <button class="nav-btn" onclick="app_nextDay()">›</button>
+        </div>
+        <button class="schedule-link" onclick="app_goSchedule()">Full Schedule →</button>
+      </div>
+    </header>
+  `;
+
+  html += `
+    <div class="cta-row">
+      <button class="btn btn-primary" onclick="app_openForm('add-boat')" ${past?'disabled':''}>Add Your Boat</button>
+      <button class="btn btn-secondary" onclick="app_openForm('add-crew')" ${past?'disabled':''}>Sign Up to Crew</button>
+    </div>
+  `;
+
+  if(firestoreError){
+    html += `<div class="conn-status">Trouble connecting to the board's database right now — try refreshing.</div>`;
+  }
+
+  html += `
+    <details class="etiquette">
+      <summary>Before You Go — Safety &amp; Etiquette</summary>
+      <div class="etiquette-body">
+        <div class="etiquette-group">
+          <div class="etiquette-group-title">Before You Go</div>
+          <ul>
+            <li><b>Try to bring your own lifejacket</b> — if you don't have one, just say so and your skipper will sort you out.</li>
+            <li><b>Non-marking soles only</b> — check the sole itself, not just the color. It's about the rubber compound, not whether the shoe is black or white.</li>
+          </ul>
+        </div>
+        <div class="etiquette-group">
+          <div class="etiquette-group-title">Safety &amp; Liability</div>
+          <p>This board just connects members with boats to members who want to crew — it's not an organized ${escapeHtml(CLUB_NAME)} activity. Skippers are club members sailing their own boats, not professional or licensed captains, and aren't being paid or certified for this. They'll do their best to run a safe boat and look out for their crew, but sailing carries real risk, and by joining a sail you're acknowledging that your own safety is ultimately your own responsibility. ${escapeHtml(CLUB_NAME)} isn't organizing, supervising, or insuring these sails, and isn't liable for injury, loss, or damage arising from them.</p>
+        </div>
+        <div class="etiquette-group">
+          <div class="etiquette-group-title">Once Aboard</div>
+          <ul>
+            <li>Listen for the skipper's safety briefing before you leave the dock — where the gear is, how to move around, what to do if someone goes overboard.</li>
+            <li>During a tack or gybe, stay low and mind the boom — save questions for the calm moments.</li>
+            <li>Secure loose items (phone, hat, keys) — anything that can roll can also go over the side.</li>
+            <li>Pitch in when asked — winching, fending off, handling lines — but follow the skipper's call, especially docking and heavy air.</li>
+            <li>New to sailing? Tell your skipper up front. Every good skipper would rather brief you than assume.</li>
+          </ul>
+        </div>
+        <div class="etiquette-group">
+          <div class="etiquette-group-title">Being Good Crew</div>
+          <ul>
+            <li>RSVP, and if your plans change, tell your skipper — don't just no-show.</li>
+            <li>Show up on time; boats leave the dock together.</li>
+            <li>Help coil lines and tidy up after you dock — it's a small thing skippers notice.</li>
+            <li><b>A small thank-you to your skipper goes a long way</b> — a beer or two off the water, snacks, something for the cooler. Not required, just a nice gesture for them hosting.</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+  `;
+
+  if(uiMode === 'add-boat' && !past) html += renderBoatForm();
+  if(uiMode === 'add-crew' && !past) html += renderCrewForm(dayBoats, dayCrew);
+
+  html += `<section>
+    <div class="section-head">
+      <div class="section-title">The Fleet</div>
+      <div class="section-count">${dayBoats.length} BOAT${dayBoats.length===1?'':'S'}</div>
+    </div>`;
+
+  if(dayBoats.length === 0){
+    html += `<div class="empty">${past ? 'No boats went out this day.' : 'No boats on the board yet. Be the first skipper to claim a slip.'}</div>`;
+  } else {
+    dayBoats.forEach(boat => {
+      const assigned = dayCrew.filter(c => c.boatId === boat.id && c.status === 'confirmed');
+      const pending = dayCrew.filter(c => c.boatId === boat.id && c.status === 'pending');
+      const dots = [];
+      for(let i=0;i<boat.spots;i++) dots.push(`<span class="berth ${i<assigned.length?'filled':''}"></span>`);
+      html += `
+        <div class="slip">
+          ${past ? '' : `<button class="remove-x" onclick="app_removeBoat('${boat.id}')" title="Remove boat">×</button>`}
+          <div class="boat-name">${escapeHtml(boat.name)}</div>
+          ${boat.time ? `<div class="boat-time">Departs ${formatTime12(boat.time)}</div>` : ''}
+          <div class="skipper">Skipper: ${escapeHtml(boat.skipper)}</div>
+          ${boat.notes ? `<div class="slip-notes">${escapeHtml(boat.notes)}</div>` : ''}
+          <div class="berths">${dots.join('')}<span class="berth-label">${assigned.length}/${boat.spots} CREWED</span></div>
+          ${assigned.length ? `<div class="crew-names"><b>Aboard:</b> ${assigned.map(c=>escapeHtml(c.name)).join(', ')}</div>` : ''}
+          ${(!past && assigned.length < boat.spots) ? `<div class="slip-actions"><button class="link-btn" onclick="app_openForm('add-crew','${boat.id}')">Join this boat</button></div>` : ''}
+          ${(!past && pending.length) ? `
+            <div class="pending-block">
+              <div class="pending-block-label">Needs your OK (${pending.length})</div>
+              ${pending.map(c => `
+                <div class="pending-row">
+                  <div>
+                    <div class="pending-row-name">${escapeHtml(c.name)}</div>
+                    <div class="pending-row-meta">${escapeHtml(c.experience||'')}${c.notes?' · '+escapeHtml(c.notes):''}</div>
+                  </div>
+                  <div class="pending-actions">
+                    <button class="approve-btn" onclick="app_approveCrew('${boat.id}','${c.id}')">Approve</button>
+                    <button class="decline-btn" onclick="app_declineCrew('${boat.id}','${c.id}')">Decline</button>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+        </div>
+      `;
+    });
+  }
+  html += `</section>`;
+
+  html += `<section>
+    <div class="section-head">
+      <div class="section-title">Crew Pool</div>
+      <div class="section-count">${unassignedCrew.length} OPEN</div>
+    </div>`;
+
+  if(unassignedCrew.length === 0){
+    html += `<div class="empty">${past ? 'No unmatched crew this day.' : "Crew pool's empty. Sign up and wait for a skipper — or check the fleet above for open slips."}</div>`;
+  } else {
+    unassignedCrew.forEach(c => {
+      html += `
+        <div class="crew-card-wrap">
+          <div class="crew-card">
+            <div>
+              <div class="crew-name">${escapeHtml(c.name)}</div>
+              <div class="crew-meta">${escapeHtml(c.experience||'')}${c.notes?' · '+escapeHtml(c.notes):''}</div>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
+              ${past ? '' : `<button class="link-btn" onclick="app_toggleAddToBoat('${c.id}')">${addToBoatFor===c.id?'Close':'Add to boat'}</button>`}
+              ${past ? '' : `<button class="remove-x" style="position:static;" onclick="app_removeCrew('${c.id}')" title="Remove">×</button>`}
+            </div>
+          </div>
+          ${(!past && addToBoatFor === c.id) ? renderAddToBoatPanel(c, dayBoats, dayCrew) : ''}
+        </div>
+      `;
+    });
+  }
+
+  const myPending = dayCrew.filter(c => c.boatId && c.status === 'pending');
+  if(myPending.length){
+    html += `<div class="pending-block-label" style="margin-top:14px;">Awaiting skipper approval</div>`;
+    myPending.forEach(c => {
+      const boat = dayBoats.find(b => b.id === c.boatId);
+      html += `
+        <div class="crew-card-wrap">
+          <div class="crew-card">
+            <div>
+              <div class="crew-name">${escapeHtml(c.name)} <span class="status-tag pending">Pending</span></div>
+              <div class="crew-meta">Requested ${boat ? escapeHtml(boat.name) : 'a boat'}</div>
+            </div>
+            ${past ? '' : `<button class="remove-x" style="position:static;" onclick="app_removeCrew('${c.id}')" title="Remove">×</button>`}
+          </div>
+        </div>
+      `;
+    });
+  }
+  html += `</section>`;
+
+  html += `<footer>ANY DAY WELCOME · THURSDAYS ARE THE REGULAR RHYTHM · SHARED WITH ANYONE WHO HAS THIS LINK</footer>`;
+
+  document.getElementById('root').innerHTML = html;
+}
+
+function renderBoatForm(){
+  const defaultDate = currentIso;
+  return `
+    <div class="form-panel">
+      <div class="form-title">Add Your Boat</div>
+      <div class="field-row">
+        <div class="field"><label>Date</label><input id="f-boat-date" type="date" value="${defaultDate}" /></div>
+        <div class="field"><label>Departure Time</label><input id="f-boat-time" type="time" value="18:00" /></div>
+      </div>
+      <div class="field"><label>Boat Name</label><input id="f-boat-name" placeholder="e.g. Windborne" /></div>
+      <div class="field"><label>Skipper</label><input id="f-boat-skipper" placeholder="Your name" /></div>
+      <div class="field"><label>Your Email</label><input id="f-boat-email" type="email" placeholder="you@example.com" /></div>
+      <div class="field"><label>Open Crew Spots</label><input id="f-boat-spots" type="number" min="0" max="12" value="2" /></div>
+      <div class="field"><label>Notes (dock, meeting spot — optional)</label><textarea id="f-boat-notes" placeholder="e.g. C-dock"></textarea></div>
+      <div class="field"><label>Set a PIN (4+ chars — used to approve crew and manage this listing)</label><input id="f-boat-pin" type="text" placeholder="e.g. wnd35" /></div>
+      <div class="form-note">Your email is used only to notify you about this listing — it's not shown publicly on the board.</div>
+      <div id="f-boat-error" class="form-error" style="display:none;"></div>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="app_submitBoat()">Add to Board</button>
+        <button class="btn btn-cancel" onclick="app_closeForm()">Cancel</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderCrewForm(dayBoats, dayCrew){
+  const preselect = uiCrewPreselectBoat || '';
+  let options = `<option value="">Any boat / no preference</option>`;
+  dayBoats.forEach(b => {
+    const confirmedCount = dayCrew.filter(c => c.boatId === b.id && c.status === 'confirmed').length;
+    const pendingCount = dayCrew.filter(c => c.boatId === b.id && c.status === 'pending').length;
+    const full = confirmedCount >= b.spots;
+    const pendingNote = pendingCount ? `, ${pendingCount} pending` : '';
+    options += `<option value="${b.id}" ${b.id===preselect?'selected':''} ${full?'disabled':''}>${escapeHtml(b.name)} (${b.spots-confirmedCount} open${pendingNote})${full?' — full':''}</option>`;
+  });
+  return `
+    <div class="form-panel">
+      <div class="form-title">Sign Up to Crew</div>
+      <div class="field"><label>Your Name</label><input id="f-crew-name" placeholder="Your name" /></div>
+      <div class="field"><label>Your Email</label><input id="f-crew-email" type="email" placeholder="you@example.com" /></div>
+      <div class="field"><label>Experience</label>
+        <select id="f-crew-exp"><option>New to sailing</option><option>Some experience</option><option>Experienced</option></select>
+      </div>
+      <div class="field"><label>Boat Preference</label><select id="f-crew-boat">${options}</select></div>
+      <div class="field"><label>Notes (optional)</label><textarea id="f-crew-notes" placeholder="anything your skipper should know"></textarea></div>
+      <div class="field"><label>Set a PIN (4+ chars — used to delete your signup later)</label><input id="f-crew-pin" type="text" placeholder="e.g. sail22" /></div>
+      <div class="form-note">Your email is used only to notify you about this signup — it's not shown publicly on the board.</div>
+      <div id="f-crew-error" class="form-error" style="display:none;"></div>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="app_submitCrew()">Join the Board</button>
+        <button class="btn btn-cancel" onclick="app_closeForm()">Cancel</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderAddToBoatPanel(crewPerson, dayBoats, dayCrew){
+  const eligible = dayBoats.filter(b => {
+    const confirmed = dayCrew.filter(cc => cc.boatId === b.id && cc.status === 'confirmed').length;
+    return confirmed < b.spots;
+  });
+  if(eligible.length === 0){
+    return `<div class="empty" style="margin-top:6px; padding:12px 14px;">No boats have open spots right now.</div>`;
+  }
+  const opts = eligible.map(b => {
+    const confirmed = dayCrew.filter(cc => cc.boatId === b.id && cc.status === 'confirmed').length;
+    return `<option value="${b.id}">${escapeHtml(b.name)} (${b.spots-confirmed} open)</option>`;
+  }).join('');
+  return `
+    <div class="form-panel" style="margin:6px 0 0; padding:12px 14px;">
+      <div class="field" style="margin-bottom:8px;">
+        <label>Add ${escapeHtml(crewPerson.name)} to</label>
+        <select id="add-to-boat-select-${crewPerson.id}">${opts}</select>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="app_confirmAddToBoat('${crewPerson.id}')">Add</button>
+        <button class="btn btn-cancel" onclick="app_toggleAddToBoat('${crewPerson.id}')">Cancel</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderScheduleScreen(){
+  let html = '';
+  html += `
+    <header>
+      <button class="back-link" onclick="app_goWeek(currentIsoGlobal())">← Back to board</button>
+      <h1>Full<br>Schedule</h1>
+      <div class="date-readout">TAP A DAY TO OPEN ITS BOARD</div>
+    </header>
+    <section style="padding-top:22px;">
+  `;
+
+  const todayIso = toISO(new Date());
+  // backbone Thursdays
+  const backboneDates = WEEK_OFFSETS.map(o => toISO(thursdayForOffset(o)));
+  // any other actual dates with boats, within our loaded window
+  const extraDates = [...new Set(boats.map(b => b.date))].filter(d => !backboneDates.includes(d));
+  const allDates = [...new Set([...backboneDates, ...extraDates])].sort();
+
+  allDates.forEach(iso => {
+    const dateObj = new Date(iso + 'T00:00:00');
+    const past = isPastIso(iso);
+    const isCurrent = iso === BASE_ISO;
+    const dayBoats = boatsForDate(iso);
+    const isThursday = dateObj.getDay() === 4;
+    let boatsLine = '';
+    if(dayBoats.length){
+      const names = dayBoats.map(b=>b.name);
+      const shown = names.slice(0,3).join(', ');
+      const extra = names.length > 3 ? ` +${names.length-3} more` : '';
+      boatsLine = `<div class="week-card-boats">${escapeHtml(shown)}${extra}</div>`;
+    }
+    html += `
+      <button class="week-card ${past?'is-past':''} ${isCurrent?'is-current':''}" onclick="app_goWeek('${iso}')">
+        <div>
+          <div class="week-card-date">${formatShort(dateObj)}${iso===todayIso?'<span class="today-tag">Today</span>':''}</div>
+          <div class="week-card-sub">${past ? 'Sailed' : (isCurrent ? 'This week' : (isThursday ? 'Thursday' : dateObj.toLocaleDateString('en-US',{weekday:'long'})))}</div>
+          ${boatsLine}
+        </div>
+        <div class="week-card-count">${dayBoats.length}<small>BOATS</small></div>
+      </button>
+    `;
+  });
+
+  html += `</section><footer>SIGN-UPS OPEN FOR THIS WEEK AND FUTURE DAYS · ANY DAY WELCOME</footer>`;
+  document.getElementById('root').innerHTML = html;
+}
+
+// ---------- navigation ----------
+window.currentIsoGlobal = () => currentIso;
+window.app_prevDay = () => {
+  const idx = WEEK_OFFSETS.findIndex(o => toISO(thursdayForOffset(o)) === currentIso);
+  if(idx > 0){ currentIso = toISO(thursdayForOffset(WEEK_OFFSETS[idx-1])); }
+  else { const d = new Date(currentIso+'T00:00:00'); d.setDate(d.getDate()-7); currentIso = toISO(d); }
+  uiMode = null; addToBoatFor = null; render();
+};
+window.app_nextDay = () => {
+  const idx = WEEK_OFFSETS.findIndex(o => toISO(thursdayForOffset(o)) === currentIso);
+  if(idx >= 0 && idx < WEEK_OFFSETS.length-1){ currentIso = toISO(thursdayForOffset(WEEK_OFFSETS[idx+1])); }
+  else { const d = new Date(currentIso+'T00:00:00'); d.setDate(d.getDate()+7); currentIso = toISO(d); }
+  uiMode = null; addToBoatFor = null; render();
+};
+window.app_goWeek = (iso) => { currentIso = iso; screen = 'week'; uiMode = null; addToBoatFor = null; render(); };
+window.app_goSchedule = () => { screen = 'schedule'; addToBoatFor = null; render(); };
+window.app_openForm = (mode, boatId) => {
+  uiMode = mode; uiCrewPreselectBoat = boatId || null; render();
+  setTimeout(() => { const panel = document.querySelector('.form-panel'); if(panel) panel.scrollIntoView({behavior:'smooth', block:'center'}); }, 30);
+};
+window.app_closeForm = () => { uiMode = null; uiCrewPreselectBoat = null; render(); };
+window.app_toggleAddToBoat = (crewId) => { addToBoatFor = addToBoatFor === crewId ? null : crewId; render(); };
+
+// ---------- writes ----------
+window.app_submitBoat = async () => {
+  const date = document.getElementById('f-boat-date').value;
+  const time = document.getElementById('f-boat-time').value;
+  const name = document.getElementById('f-boat-name').value.trim();
+  const skipper = document.getElementById('f-boat-skipper').value.trim();
+  const skipperEmail = document.getElementById('f-boat-email').value.trim();
+  const spots = parseInt(document.getElementById('f-boat-spots').value, 10);
+  const notes = document.getElementById('f-boat-notes').value.trim();
+  const pin = document.getElementById('f-boat-pin').value.trim();
+  const errorEl = document.getElementById('f-boat-error');
+
+  if(!date || !name || !skipper || !skipperEmail || isNaN(spots) || spots < 0){
+    errorEl.textContent = 'Date, boat name, skipper, email, and crew spots are required.';
+    errorEl.style.display = 'block'; return;
+  }
+  if(!pin || pin.length < 4){
+    errorEl.textContent = 'Set a PIN of at least 4 characters.';
+    errorEl.style.display = 'block'; return;
+  }
+  try{
+    await addDoc(boatsCol, { date, time, name, skipper, skipperEmail, spots, notes, pin, createdAt: serverTimestamp() });
+    sendNotification(skipperEmail, skipper, `Your boat is on the board for ${date}`,
+      `You're all set — ${name} is listed for ${date}${time?' at '+formatTime12(time):''}, with ${spots} open crew spot(s). Crew requests to join will come to you by email as they arrive.`, '');
+    currentIso = date; screen = 'week';
+    window.app_closeForm();
+  }catch(e){
+    errorEl.textContent = "Couldn't save — check your connection and try again.";
+    errorEl.style.display = 'block'; console.error(e);
+  }
+};
+
+window.app_submitCrew = async () => {
+  const name = document.getElementById('f-crew-name').value.trim();
+  const email = document.getElementById('f-crew-email').value.trim();
+  const experience = document.getElementById('f-crew-exp').value;
+  const boatId = document.getElementById('f-crew-boat').value || null;
+  const notes = document.getElementById('f-crew-notes').value.trim();
+  const pin = document.getElementById('f-crew-pin').value.trim();
+  const errorEl = document.getElementById('f-crew-error');
+
+  if(!name || !email){ errorEl.textContent = 'Name and email are required.'; errorEl.style.display='block'; return; }
+  if(!pin || pin.length < 4){ errorEl.textContent = 'Set a PIN of at least 4 characters.'; errorEl.style.display='block'; return; }
+
+  const status = boatId ? 'pending' : 'confirmed';
+  try{
+    const docRef = await addDoc(crewCol, { date: currentIso, name, email, experience, boatId, status, notes, pin, createdAt: serverTimestamp() });
+    if(boatId){
+      const boat = boats.find(b => b.id === boatId);
+      sendNotification(email, name, `Request sent for ${boat ? boat.name : 'your boat'}`,
+        `Your request to crew aboard ${boat ? boat.name : 'the boat'} for ${currentIso} has been sent to the skipper. You'll get an email as soon as they respond.`, '');
+      if(boat && boat.skipperEmail){
+        sendNotification(boat.skipperEmail, boat.skipper, `${name} wants to crew for you on ${currentIso}`,
+          `${name} (${experience}) has requested to crew aboard ${boat.name} for ${currentIso}.`,
+          notes ? `Note from ${name}: ${notes}` : '');
+      }
+    } else {
+      sendNotification(email, name, `You're in the crew pool for ${currentIso}`,
+        `You're signed up in the crew pool for ${currentIso}. Skippers with open spots can add you directly, or check back to request a specific boat.`, '');
+    }
+    window.app_closeForm();
+  }catch(e){
+    errorEl.textContent = "Couldn't save — check your connection and try again.";
+    errorEl.style.display = 'block'; console.error(e);
+  }
+};
+
+window.app_confirmAddToBoat = async (crewId) => {
+  const select = document.getElementById('add-to-boat-select-' + crewId);
+  if(!select || !select.value) return;
+  const boatId = select.value;
+  const boat = boats.find(b => b.id === boatId);
+  const person = crew.find(c => c.id === crewId);
+  if(!boat || !person) return;
+  const entered = prompt(`Enter your skipper PIN for "${boat.name}" to add ${person.name} to your boat:`);
+  if(entered === null) return;
+  if(entered !== boat.pin && entered !== ADMIN_PASSCODE){ alert('Wrong PIN.'); return; }
+  try{
+    await updateDoc(doc(db,'crew',crewId), { boatId, status:'confirmed' });
+    sendNotification(person.email, person.name, `You're on ${boat.name} for ${boat.date}`,
+      `${boat.skipper} added you to ${boat.name} for ${boat.date}${boat.time?' at '+formatTime12(boat.time):''}.`, '');
+    addToBoatFor = null;
+  }catch(e){ alert("Couldn't save — try again."); console.error(e); }
+};
+
+window.app_removeBoat = async (id) => {
+  const boat = boats.find(b => b.id === id);
+  if(!boat) return;
+  const entered = prompt(`Enter the PIN for "${boat.name}" to remove this listing:`);
+  if(entered === null) return;
+  if(entered !== boat.pin && entered !== ADMIN_PASSCODE){ alert('Wrong PIN.'); return; }
+  try{
+    const affected = crew.filter(c => c.boatId === id);
+    for(const c of affected){
+      await updateDoc(doc(db,'crew',c.id), { boatId: null, status: 'confirmed' });
+      sendNotification(c.email, c.name, `${boat.name} is no longer sailing ${boat.date}`,
+        `${boat.name} was cancelled for ${boat.date}. You've been moved back into the open crew pool — another skipper can pick you up from there.`, '');
+    }
+    await deleteDoc(doc(db,'boats',id));
+  }catch(e){ alert("Couldn't remove — try again."); console.error(e); }
+};
+
+window.app_removeCrew = async (id) => {
+  const person = crew.find(c => c.id === id);
+  if(!person) return;
+  const entered = prompt(`Enter your PIN to remove "${person.name}"'s signup:`);
+  if(entered === null) return;
+  if(entered !== person.pin && entered !== ADMIN_PASSCODE){ alert('Wrong PIN.'); return; }
+  try{
+    if(person.boatId){
+      const boat = boats.find(b => b.id === person.boatId);
+      if(boat && boat.skipperEmail){
+        sendNotification(boat.skipperEmail, boat.skipper, `${person.name} cancelled on ${boat.name}`,
+          `${person.name} just cancelled their spot on ${boat.name} for ${boat.date}.`, '');
+      }
+    }
+    await deleteDoc(doc(db,'crew',id));
+  }catch(e){ alert("Couldn't remove — try again."); console.error(e); }
+};
+
+window.app_approveCrew = async (boatId, crewId) => {
+  const boat = boats.find(b => b.id === boatId);
+  const person = crew.find(c => c.id === crewId);
+  if(!boat || !person) return;
+  const entered = prompt(`Enter your skipper PIN for "${boat.name}" to approve this crew member:`);
+  if(entered === null) return;
+  if(entered !== boat.pin && entered !== ADMIN_PASSCODE){ alert('Wrong PIN.'); return; }
+  try{
+    await updateDoc(doc(db,'crew',crewId), { status:'confirmed' });
+    sendNotification(person.email, person.name, `You're confirmed on ${boat.name}`,
+      `You're confirmed to crew aboard ${boat.name} for ${boat.date}${boat.time?' at '+formatTime12(boat.time):''}.`, '');
+  }catch(e){ alert("Couldn't save — try again."); console.error(e); }
+};
+
+window.app_declineCrew = async (boatId, crewId) => {
+  const boat = boats.find(b => b.id === boatId);
+  const person = crew.find(c => c.id === crewId);
+  if(!boat || !person) return;
+  const entered = prompt(`Enter your skipper PIN for "${boat.name}" to decline this crew member:`);
+  if(entered === null) return;
+  if(entered !== boat.pin && entered !== ADMIN_PASSCODE){ alert('Wrong PIN.'); return; }
+  try{
+    await updateDoc(doc(db,'crew',crewId), { boatId: null, status: 'confirmed' });
+    sendNotification(person.email, person.name, `Update on your request for ${boat.name}`,
+      `The skipper wasn't able to take you on for ${boat.name} this time. You've been moved back into the open crew pool for ${boat.date} — another skipper can pick you up, or you can request a different boat.`, '');
+  }catch(e){ alert("Couldn't save — try again."); console.error(e); }
+};
+
+render();
+</script>
+</body>
+</html>
